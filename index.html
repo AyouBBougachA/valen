@@ -1,0 +1,1056 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Happy Valentine's Day</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg1: #4b0f16;
+        --bg2: #7a1f2a;
+        --accent: #d2263a;
+        --accent-light: #ff6b8f;
+        --muted: #fff5f6;
+        --card-bg: rgba(255, 246, 247, 0.06);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family:
+          "Poppins",
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          "Helvetica Neue",
+          Arial;
+        background:
+          radial-gradient(
+            900px 420px at 8% 18%,
+            rgba(210, 38, 58, 0.08) 0%,
+            transparent 12%
+          ),
+          radial-gradient(
+            800px 360px at 90% 85%,
+            rgba(210, 38, 58, 0.04) 0%,
+            transparent 10%
+          ),
+          linear-gradient(180deg, var(--bg1), var(--bg2));
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 20px;
+        min-height: 100vh;
+        gap: 20px;
+        color: var(--muted);
+        overflow: hidden; /* prevent scrolling - two separate page views */
+      }
+
+      /* starfield canvas sits behind content */
+      #starfield {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -1; /* behind everything */
+        pointer-events: none;
+        display: block;
+        transition: opacity 0.6s ease;
+      }
+      #starfield.hidden {
+        opacity: 0;
+      }
+
+      .wrap {
+        width: 100%;
+        max-width: 1200px;
+        max-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        z-index: 3; /* above canvas */
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        visibility: hidden;
+        transition:
+          opacity 0.8s ease,
+          visibility 0.8s ease;
+        overflow-y: auto;
+        padding: 20px 0;
+      }
+      .wrap.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 720px;
+        border-radius: 18px;
+        padding: 14px 18px 18px 18px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.03),
+          rgba(255, 255, 255, 0.02)
+        );
+        box-shadow:
+          0 12px 36px rgba(45, 10, 12, 0.28),
+          inset 0 1px 0 rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(6px) saturate(1.02);
+        position: relative;
+        overflow: visible;
+      }
+
+      .top-row {
+        width: 100%;
+        display: none;
+        gap: 8px;
+        margin-bottom: 12px;
+        align-items: stretch;
+      }
+      .top-row .thumb {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        border-radius: 8px;
+        display: block;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+      }
+
+      .top-image {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+      .top-image img {
+        width: 100%;
+        max-width: 420px;
+        height: auto;
+        border-radius: 12px;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
+        object-fit: cover;
+        display: block;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+      }
+
+      header {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        margin-bottom: 6px;
+      }
+      .title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .logo-heart {
+        width: 46px;
+        height: 46px;
+        background: radial-gradient(
+          circle at 30% 20%,
+          rgba(255, 110, 140, 0.06),
+          rgba(255, 110, 140, 0.02)
+        );
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+        transform: translateY(-2px);
+      }
+      .logo-heart svg {
+        width: 26px;
+        height: 26px;
+      }
+      h1 {
+        font-size: clamp(1.35rem, 2.8vw, 1.7rem);
+        margin: 0;
+        color: var(--muted);
+        letter-spacing: -0.4px;
+      }
+      .subtitle {
+        font-size: 0.95rem;
+        color: rgba(255, 245, 246, 0.95);
+        opacity: 0.95;
+      }
+
+      .controls {
+        margin-top: 14px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        position: relative;
+        min-height: 56px;
+      }
+      button {
+        -webkit-tap-highlight-color: transparent;
+        border: 0;
+        cursor: pointer;
+        padding: 12px 18px;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 1rem;
+        min-width: 120px;
+        transition:
+          transform 0.18s ease,
+          box-shadow 0.18s ease,
+          left 0.28s ease,
+          top 0.28s ease,
+          opacity 0.18s;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+        position: relative;
+        z-index: 3;
+        background-clip: padding-box;
+        color: var(--muted);
+      }
+      button:active {
+        transform: scale(0.98);
+      }
+      #yes {
+        background: linear-gradient(90deg, var(--accent), var(--accent-light));
+        color: white;
+        box-shadow: 0 10px 28px rgba(210, 38, 58, 0.14);
+        min-width: 140px;
+      }
+      #yes[disabled] {
+        opacity: 0.6;
+        transform: scale(0.995);
+        cursor: default;
+      }
+      #no {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.04),
+          rgba(255, 255, 255, 0.02)
+        );
+        color: var(--accent);
+        border: 1px solid rgba(210, 38, 58, 0.06);
+        min-width: 140px;
+      }
+
+      #result {
+        margin-top: 16px;
+        text-align: center;
+        color: var(--muted);
+        font-weight: 500;
+        display: none;
+        line-height: 1.35;
+      }
+      .tiny {
+        margin-top: 8px;
+        font-size: 0.86rem;
+        color: rgba(255, 245, 246, 0.85);
+      }
+
+      .bg-hearts {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        overflow: visible;
+        transition: opacity 0.6s ease;
+      }
+      .bg-hearts.hidden {
+        opacity: 0;
+      }
+      .bg-heart {
+        position: absolute;
+        opacity: 0.95;
+        transform-origin: center;
+        will-change: transform, opacity;
+        filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.22));
+        text-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+      }
+
+      @keyframes upFloat {
+        0% {
+          transform: translateY(0) scale(0.92);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-120vh) scale(1.18);
+          opacity: 0;
+        }
+      }
+
+      .particle {
+        position: fixed;
+        will-change: transform, opacity;
+        pointer-events: none;
+        z-index: 9999;
+        font-weight: 700;
+        text-shadow: 0 1px 8px rgba(0, 0, 0, 0.25);
+      }
+      @keyframes fling {
+        0% {
+          transform: translate(0, 0) rotate(0) scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(var(--tx, 0), var(--ty, 0)) rotate(var(--rot, 0))
+            scale(1.12);
+          opacity: 0;
+        }
+      }
+
+      .bottom-row {
+        width: 100%;
+        max-width: 720px;
+        display: none;
+        gap: 8px;
+        justify-content: center;
+      }
+      .bottom-row .thumb {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        border-radius: 8px;
+        display: block;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+      }
+
+      .top-row,
+      .bottom-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+      }
+
+      /* valentines button — positioned on canvas page after animated text */
+      #valentinesButton {
+        display: none;
+        position: fixed;
+        left: 50%;
+        top: 60%;
+        transform: translateX(-50%);
+        background: linear-gradient(90deg, var(--accent), var(--accent-light));
+        color: white;
+        border-radius: 999px;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 8px 20px rgba(210, 38, 58, 0.3);
+        border: none;
+        cursor: pointer;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease,
+          opacity 0.36s ease;
+        z-index: 10;
+        opacity: 0;
+      }
+      #valentinesButton.show {
+        opacity: 1;
+      }
+      #valentinesButton:hover {
+        transform: translateX(-50%) scale(1.05);
+        box-shadow: 0 10px 28px rgba(210, 38, 58, 0.4);
+      }
+
+      /* mobile / responsive tweaks */
+      @media (max-width: 1100px) {
+        .top-row,
+        .bottom-row {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      @media (max-width: 880px) {
+        .top-row,
+        .bottom-row {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .card {
+          padding: 12px;
+        }
+        button {
+          min-width: 110px;
+          padding: 10px 14px;
+        }
+        #valentinesButton {
+          width: 100%;
+          max-width: 320px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .bg-heart,
+        .particle {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+
+    <div class="bg-hearts" aria-hidden="true"></div>
+
+    <!-- button to continue to valentine card -->
+    <button id="valentinesButton">Continue ❤</button>
+
+    <div class="wrap">
+      <main class="card" role="main" aria-labelledby="heading">
+        <div class="top-row" id="topRow" aria-hidden="true"></div>
+
+        <div class="top-image" id="topImageWrap">
+          <img id="topImage" alt="cute placeholder" src="" />
+        </div>
+
+        <header>
+          <div class="title">
+            <div class="logo-heart" aria-hidden="true">
+              "<svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12 20s-7.5-4.6-9-7.2C1.8 9.9 5.2 6 8.5 7.6 10.1 8.4 11.2 10 12 11.1c.8-1.1 1.9-2.7 3.5-3.5C18.8 6 22.2 9.9 21 12.8 19.5 15.4 12 20 12 20z"
+                  fill="var(--accent)"
+                />
+              </svg>"
+            </div>
+            <h1 id="heading">Will you be my Valentine?</h1>
+          </div>
+          <div class="subtitle">
+            
+          </div>
+        </header>
+
+        <section class="controls" id="controls">
+          <button id="yes" aria-label="Yes, I will">Yes — I will </button>
+          <button id="no" aria-label="No, not now">No — sorry 🙈</button>
+        </section>
+
+        <div id="result" role="status" aria-live="polite"></div>
+        <div class="tiny"></div>
+      </main>
+
+      <div class="bottom-row" id="bottomRow" aria-hidden="true"></div>
+    </div>
+
+    <script>
+      /* -------------------- Starfield + Text animation (merged & refactored) -------------------- */
+      (function () {
+        const canvas = document.getElementById("starfield");
+        const ctx = canvas.getContext("2d");
+        let w = (canvas.width = window.innerWidth);
+        let h = (canvas.height = window.innerHeight);
+
+        const STAR_COUNT = Math.round(Math.max(200, (w * h) / 3000)); // scale stars for larger screens
+        const colorrange = [0, 60, 240];
+        const stars = [];
+
+        function getRandom(min, max) {
+          return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function initStars() {
+          stars.length = 0;
+          for (let i = 0; i < STAR_COUNT; i++) {
+            const x = Math.random() * w;
+            const y = Math.random() * h;
+            const radius = Math.random() * (1.1 + (w < 600 ? 0.3 : 0.7));
+            const hue = colorrange[getRandom(0, colorrange.length - 1)];
+            const sat = getRandom(40, 100);
+            const opacity = Math.random() * 0.9 + 0.05;
+            stars.push({
+              x,
+              y,
+              radius,
+              hue,
+              sat,
+              opacity,
+              baseOpacity: opacity,
+              twinkle: Math.random() > 0.98,
+            });
+          }
+        }
+
+        function drawStars() {
+          for (let i = 0; i < stars.length; i++) {
+            const s = stars[i];
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+            ctx.fillStyle = `hsla(${s.hue}, ${s.sat}%, 88%, ${s.opacity})`;
+            ctx.fill();
+          }
+        }
+
+        function updateStars() {
+          for (let i = 0; i < stars.length; i++) {
+            const s = stars[i];
+            if (s.twinkle && Math.random() > 0.94) {
+              s.opacity = Math.random() * 0.9 + 0.05;
+            }
+            // small slow shimmer for effect
+            s.opacity = s.baseOpacity + Math.sin(Date.now() / 1000 + i) * 0.02;
+            if (s.opacity < 0) s.opacity = 0;
+          }
+        }
+
+        // Text animation values (kept similar to your original timing)
+        let frameNumber = 0;
+        let opacity = 0;
+        let secondOpacity = 0;
+        let thirdOpacity = 0;
+
+        function drawTextWithLineBreaks(lines, x, y, fontSize, lineHeight) {
+          ctx.textBaseline = "middle";
+          lines.forEach((line, index) => {
+            ctx.fillText(line, x, y + index * (fontSize + lineHeight));
+          });
+        }
+
+        function drawText() {
+          const fontSize = Math.min(30, window.innerWidth / 24);
+          const lineHeight = 8;
+          ctx.font = `${fontSize}px Comic Sans MS, "Comic Sans", system-ui`;
+          ctx.textAlign = "center";
+
+          // glow effect
+          ctx.shadowColor = "rgba(45, 45, 255, 1)";
+          ctx.shadowBlur = 8;
+
+          // a sequence of message fades; simplified so it works well on mobile but retains your progression
+          // (timing uses the same breakpoints you had)
+          if (frameNumber < 250) {
+            ctx.fillStyle = `rgba(45,45,255,${opacity})`;
+            ctx.fillText(
+              "everyday I cannot believe how lucky I am",
+              w / 2,
+              h / 2,
+            );
+            opacity = Math.min(1, opacity + 0.01);
+          } else if (frameNumber < 500) {
+            ctx.fillStyle = `rgba(45,45,255,${opacity})`;
+            ctx.fillText(
+              "everyday I cannot believe how lucky I am",
+              w / 2,
+              h / 2,
+            );
+            opacity = Math.max(0, opacity - 0.01);
+          } else if (frameNumber < 750) {
+            ctx.fillStyle = `rgba(45,45,255,${opacity})`;
+            if (w < 600) {
+              drawTextWithLineBreaks(
+                [
+                  "amongst trillions and trillions of stars,",
+                  "over billions of years",
+                ],
+                w / 2,
+                h / 2,
+                fontSize,
+                lineHeight,
+              );
+            } else {
+              ctx.fillText(
+                "amongst trillions and trillions of stars, over billions of years",
+                w / 2,
+                h / 2,
+              );
+            }
+            opacity = Math.min(1, opacity + 0.01);
+          } else if (frameNumber < 1000) {
+            ctx.fillStyle = `rgba(45,45,255,${opacity})`;
+            if (w < 600) {
+              drawTextWithLineBreaks(
+                [
+                  "amongst trillions and trillions of stars,",
+                  "over billions of years",
+                ],
+                w / 2,
+                h / 2,
+                fontSize,
+                lineHeight,
+              );
+            } else {
+              ctx.fillText(
+                "amongst trillions and trillions of stars, over billions of years",
+                w / 2,
+                h / 2,
+              );
+            }
+            opacity = Math.max(0, opacity - 0.01);
+          } else if (frameNumber < 1250) {
+            opacity = Math.min(1, opacity + 0.01);
+            ctx.fillStyle = `rgba(45,45,255,${opacity})`;
+            ctx.fillText(
+              "to be alive, and to get to spend this life with you",
+              w / 2,
+              h / 2,
+            );
+          } else if (frameNumber < 1500) {
+            ctx.fillStyle = `rgba(45,45,255,${opacity})`;
+            ctx.fillText(
+              "to be alive, and to get to spend this life with you",
+              w / 2,
+              h / 2,
+            );
+            opacity = Math.max(0, opacity - 0.01);
+          } else if (frameNumber < 1750) {
+            opacity = Math.min(1, opacity + 0.01);
+            ctx.fillStyle = `rgba(45,45,255,${opacity})`;
+            ctx.fillText(
+              "is so incredibly, unfathomably unlikely",
+              w / 2,
+              h / 2,
+            );
+          } else if (frameNumber < 2000) {
+            ctx.fillStyle = `rgba(45,45,255,${opacity})`;
+            ctx.fillText(
+              "is so incredibly, unfathomably unlikely",
+              w / 2,
+              h / 2,
+            );
+            opacity = Math.max(0, opacity - 0.01);
+          } else if (frameNumber < 2250) {
+            opacity = Math.min(1, opacity + 0.01);
+            ctx.fillStyle = `rgba(45,45,255,${opacity})`;
+            if (w < 600) {
+              drawTextWithLineBreaks(
+                [
+                  "and yet here I am to get the impossible",
+                  "chance to get to know you",
+                ],
+                w / 2,
+                h / 2,
+                fontSize,
+                lineHeight,
+              );
+            } else {
+              ctx.fillText(
+                "and yet here I am to get the impossible chance to get to know you",
+                w / 2,
+                h / 2,
+              );
+            }
+          } else if (frameNumber < 2500) {
+            ctx.fillStyle = `rgba(45,45,255,${opacity})`;
+            if (w < 600) {
+              drawTextWithLineBreaks(
+                [
+                  "and yet here I am to get the impossible",
+                  "chance to get to know you",
+                ],
+                w / 2,
+                h / 2,
+                fontSize,
+                lineHeight,
+              );
+            } else {
+              ctx.fillText(
+                "and yet here I am to get the impossible chance to get to know you",
+                w / 2,
+                h / 2,
+              );
+            }
+            opacity = Math.max(0, opacity - 0.01);
+          } else {
+            // final long message fades in
+            ctx.fillStyle = `rgba(45,45,255,${opacity})`;
+            if (w < 600) {
+              drawTextWithLineBreaks(
+                [
+                  "I LOOOVEEEE YOUUUU so much FLLOOOOFFFFF , more than",
+                  "all the time and space in the universe can contain",
+                ],
+                w / 2,
+                h / 2 - 12,
+                fontSize,
+                lineHeight,
+              );
+            } else {
+              ctx.fillText(
+                "I LLOOOVEVEE YOOOUUU so much FLOOOOFFFFF, ",
+                w / 2,
+                h / 2 - 18,
+              );
+              
+            }
+            opacity = Math.min(1, opacity + 0.01);
+
+            // second paragraph fades in slightly after
+            ctx.fillStyle = `rgba(45,45,255,${secondOpacity})`;
+            if (w < 600) {
+              drawTextWithLineBreaks(
+                [
+                  "and I can't wait to spend all the time in",
+                  "the world to share that love with you!",
+                ],
+                w / 2,
+                h / 2 + 40,
+                fontSize,
+                lineHeight,
+              );
+            } else {
+              ctx.fillText(
+                "more than all the time and space in the universe can contain",
+                w / 2,
+                h / 2 + 50,
+              );
+            }
+            secondOpacity = Math.min(1, secondOpacity + 0.01);
+
+            // final small line
+            ctx.fillStyle = `rgba(45,45,255,${thirdOpacity})`;
+            ctx.fillText("and I can't wait to spend all the time in the world to share that love with you!", w / 2, h / 2 + 110);
+            thirdOpacity = Math.min(1, thirdOpacity + 0.01);
+
+            // reveal the valentines button once the final text is visible
+            if (thirdOpacity > 0.9) {
+              const valentineBtn = document.getElementById("valentinesButton");
+              if (valentineBtn && !valentineBtn.classList.contains("show")) {
+                valentineBtn.style.display = "block";
+                // animate entrance
+                requestAnimationFrame(() => {
+                  valentineBtn.classList.add("show");
+                });
+              }
+            }
+          }
+
+          // Reset shadow
+          ctx.shadowColor = "transparent";
+          ctx.shadowBlur = 0;
+        }
+
+        function draw() {
+          // clear and paint a soft gradient so text is readable on mobile
+          ctx.clearRect(0, 0, w, h);
+          // subtle vignette / overlay (keeps stars visible)
+          const g = ctx.createLinearGradient(0, 0, 0, h);
+          g.addColorStop(0, "rgba(0,0,0,0.08)");
+          g.addColorStop(1, "rgba(0,0,0,0.14)");
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, w, h);
+
+          drawStars();
+          updateStars();
+          drawText();
+
+          frameNumber = Math.min(frameNumber + 1, 99999);
+          window.requestAnimationFrame(draw);
+        }
+
+        window.addEventListener("resize", () => {
+          w = canvas.width = window.innerWidth;
+          h = canvas.height = window.innerHeight;
+          initStars();
+        });
+
+        initStars();
+        draw();
+      })();
+
+      /* -------------------- Valentine card UI (yes/no + images + heart particles) -------------------- */
+      (function () {
+        const rand = (min, max) => Math.random() * (max - min) + min;
+
+        // NO images (single cycling)
+        const noImages = [
+          `images/image2.gif`,
+          'images/image3.gif',
+          'https://24.media.tumblr.com/tumblr_m6hadxla1U1qdlh1io1_400.gif',
+          'https://preview.redd.it/9nl1kh3u61eg1.gif?width=640&crop=smart&auto=webp&s=22ae86512104d474b8ad007c891aca751d6d0b03',
+          'https://cdn.dribbble.com/userupload/30343659/file/original-78d92a8f9560d806c636e8c88254fca7.gif',
+          'https://media1.giphy.com/media/v1.Y2lkPTZjMDliOTUyY2N0eWUwOHA0YmUxZGhwZGtneTAxcXU5YzFtd3RnZTF0eml5ZDNwNSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/fkkiCrDlX0I8xffQBO/200.gif',
+          'https://media3.giphy.com/media/v1.Y2lkPTZjMDliOTUyZWE2c3I0bHU5ajYycXVzNXhhNXJvcjZkZnNpdWY0bXJ1azIzemkxZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/bVfE9AGsqo98c/source.gif',
+          'data:image/jpeg;base64,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'
+        ];
+
+        // YES images (8 total; we'll place 3 top + 3 bottom as in earlier logic)
+        const yesImages = [
+          `https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5rF7WjwMlQKyhTiRIPqXW2o-5NSN3r0SiHA&s`,
+          'https://i.pinimg.com/736x/a9/cb/66/a9cb663bfef07f6bf2058cc293fe7da4.jpg',
+          'https://files.idyllic.app/files/static/2466341?width=256&optimizer=image',
+          'https://i.pinimg.com/736x/55/29/24/552924c5d913f43785c58e07371f8e53.jpg',
+          'images/image7.gif',
+          'https://gifdb.com/images/high/stitch-pillow-hug-sticker-n1fh4rmuhi2rktlz.gif',
+          // extra two for variety if needed
+          `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'><rect width='100%' height='100%' fill='#6b1b22'/><g transform='translate(600,360)'><circle cx='0' cy='0' r='96' fill='#ffb3c7'/></g></svg>`)}`,
+          `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'><rect width='100%' height='100%' fill='#6b1b22'/><g transform='translate(600,360)'><path d='M0-100 C-40 -60 -100 -40 -80 0 C-60 40 0 80 20 60 C60 20 100 -20 80 -60 C60 -100 30 -140 0 -100 Z' fill='#ffd6df'/></g></svg>`)}`,
+        ];
+
+        const bg = document.querySelector(".bg-hearts");
+        let heartsInterval;
+        function spawnBgHeart() {
+          const el = document.createElement("div");
+          el.className = "bg-heart";
+          const size = Math.round(rand(14, 36));
+          el.style.fontSize = size + "px";
+          el.style.left = rand(3, 92) + "vw";
+          el.style.bottom = rand(-8, -4) + "vh";
+          el.style.color = `hsl(${Math.round(rand(340, 355))}deg ${Math.round(rand(70, 92))}% ${Math.round(rand(46, 66))}%)`;
+          const dur = rand(8, 16);
+          el.style.animation = `upFloat ${dur}s linear`;
+          el.style.opacity = 0.96;
+          el.innerText = "❤";
+          bg.appendChild(el);
+          setTimeout(() => el.remove(), dur * 1000 + 200);
+        }
+        function startHearts() {
+          if (!heartsInterval) heartsInterval = setInterval(spawnBgHeart, 380);
+        }
+        function stopHearts() {
+          clearInterval(heartsInterval);
+          heartsInterval = null;
+        }
+        startHearts();
+
+        const noBtn = document.getElementById("no");
+        const yesBtn = document.getElementById("yes");
+        const controls = document.getElementById("controls");
+        const card = document.querySelector(".card");
+        const result = document.getElementById("result");
+        const topImage = document.getElementById("topImage");
+        const topRow = document.getElementById("topRow");
+        const bottomRow = document.getElementById("bottomRow");
+        const noMessages = [
+          "Are you sure? 🥺",
+          "Really sure?? 😢",
+          "I can bring chocolate 🍫",
+          "Flowers and pancakes 🌸🥞",
+          "A goofy song for you 🎶",
+          "Just one small yes? 😭",
+          "PLEAAAAAAAAAAAASSSSSSSSEE ❤️",
+        ];
+        let noCount = 0;
+        let currentImageIndex = 0;
+
+        function setTopImage(idx) {
+          currentImageIndex = idx % noImages.length;
+          topImage.src = noImages[currentImageIndex];
+          topImage.alt = `Image ${currentImageIndex + 1}`;
+        }
+        setTopImage(0);
+
+        function moveNoButton() {
+          const containerRect = card.getBoundingClientRect();
+          const btnRect = noBtn.getBoundingClientRect();
+          const padding = 12;
+          const minX = containerRect.left + padding;
+          const maxX = containerRect.right - btnRect.width - padding;
+          const minY = containerRect.top + padding + 10;
+          const maxY = containerRect.bottom - btnRect.height - padding - 10;
+          const x = rand(minX, Math.max(minX, maxX));
+          const y = rand(minY, Math.max(minY, maxY));
+          noBtn.style.position = "absolute";
+          noBtn.style.left = x - containerRect.left + "px";
+          noBtn.style.top = y - containerRect.top + "px";
+          noBtn.style.transition =
+            "transform .28s cubic-bezier(.2,.8,.25,1), left .28s ease, top .28s ease";
+          noBtn.style.transform = `translateY(${rand(-6, 6)}px) rotate(${rand(-6, 6)}deg)`;
+        }
+
+        noBtn.addEventListener("click", () => {
+          if (noCount < noMessages.length) {
+            noBtn.innerText = noMessages[noCount];
+            noCount++;
+          } else {
+            noBtn.style.transition = "opacity .44s ease, transform .44s ease";
+            noBtn.style.opacity = "0";
+            noBtn.style.transform = "scale(.92) translateY(6px)";
+            setTimeout(() => noBtn.remove(), 520);
+            yesBtn.style.minWidth = "100%";
+            yesBtn.style.transform = "scale(1.02)";
+            result.style.display = "block";
+            result.innerHTML =
+              "Hmm — seems like there's only one kind of answer left now.  😘";
+          }
+          setTopImage((currentImageIndex + 1) % noImages.length);
+          moveNoButton();
+        });
+        noBtn.addEventListener("touchstart", (e) => {
+          e.preventDefault();
+          noBtn.click();
+        });
+
+        function createParticles(x, y, count = 36) {
+          for (let i = 0; i < count; i++) {
+            const p = document.createElement("div");
+            p.className = "particle";
+            p.style.left = x + "px";
+            p.style.top = y + "px";
+            const size = Math.round(rand(10, 26));
+            p.style.fontSize = size + "px";
+            p.innerText = "❤";
+            p.style.color = `hsl(${Math.round(rand(340, 355))}deg ${Math.round(rand(72, 95))}% ${Math.round(rand(46, 66))}%)`;
+            const angle = rand(0, Math.PI * 2);
+            const radius = rand(70, 260);
+            const tx = Math.cos(angle) * radius + "px";
+            const ty = Math.sin(angle) * radius * -1 + "px";
+            const rot = Math.round(rand(-720, 720)) + "deg";
+            p.style.setProperty("--tx", tx);
+            p.style.setProperty("--ty", ty);
+            p.style.setProperty("--rot", rot);
+            const dur = rand(0.68, 1.05);
+            p.style.animation = `fling ${dur}s cubic-bezier(.2,.85,.28,1) forwards`;
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), dur * 1000 + 80);
+          }
+        }
+
+        let yesClicked = false;
+        yesBtn.addEventListener("click", (ev) => {
+          if (yesClicked) return;
+          yesClicked = true;
+          yesBtn.disabled = true;
+          noBtn.disabled = true;
+
+          // fade out / hide the centered "middle" image (id="topImage")
+          try {
+            topImage.style.transition =
+              "opacity .42s ease, transform .42s ease";
+            topImage.style.transform = "scale(.96) translateY(6px)";
+            topImage.style.opacity = "0";
+            topImage.setAttribute("aria-hidden", "true");
+            const topWrap = document.getElementById("topImageWrap");
+            setTimeout(() => {
+              if (topImage) topImage.style.display = "none";
+              if (topWrap) topWrap.style.display = "none";
+            }, 460);
+          } catch (e) {
+            console.warn("Could not hide topImage:", e);
+          }
+
+          const rect = yesBtn.getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+
+          createParticles(cx, cy, 44);
+          const trail = setInterval(() => {
+            const tX = cx + rand(-40, 40);
+            const h = document.createElement("div");
+            h.className = "bg-heart";
+            h.style.left = (tX / window.innerWidth) * 100 + "vw";
+            h.style.bottom = "-6vh";
+            h.style.fontSize = Math.round(rand(14, 26)) + "px";
+            h.style.color = `hsl(${Math.round(rand(340, 352))}deg ${Math.round(rand(72, 98))}% ${Math.round(rand(46, 66))}%)`;
+            h.style.animation = `upFloat ${rand(6, 11)}s linear`;
+            document.body.appendChild(h);
+            setTimeout(() => h.remove(), 11000);
+          }, 110);
+          setTimeout(() => clearInterval(trail), 1700);
+
+          controls.style.transition = "opacity .36s ease, transform .36s ease";
+          controls.style.opacity = "0";
+          controls.style.transform = "translateY(8px)";
+
+          setTimeout(() => {
+            result.style.display = "block";
+            result.innerHTML = `<strong style="color:var(--accent)">Y E S —</strong> YOU MADE ME THE HAPPIEST MAN. 💞`;
+          }, 360);
+
+          // populate rows after short delay
+          setTimeout(() => {
+            topRow.innerHTML = "";
+            const topFour = yesImages.slice(0, 3);
+            topFour.forEach((src, i) => {
+              const img = document.createElement("img");
+              img.className = "thumb";
+              img.src = src;
+              img.alt = `Top image ${i + 1}`;
+              topRow.appendChild(img);
+            });
+            topRow.style.display = "grid";
+            topRow.setAttribute("aria-hidden", "false");
+
+            bottomRow.innerHTML = "";
+            const bottomFour = yesImages.slice(3, 6);
+            bottomFour.forEach((src, i) => {
+              const img = document.createElement("img");
+              img.className = "thumb";
+              img.src = src;
+              img.alt = `Bottom image ${i + 1}`;
+              bottomRow.appendChild(img);
+            });
+            bottomRow.style.display = "grid";
+            bottomRow.setAttribute("aria-hidden", "false");
+          }, 520);
+
+          // ensure rows are visible on small screens
+          setTimeout(() => {
+            const topRect = topRow.getBoundingClientRect();
+            if (topRect.top < 0 || topRect.bottom > window.innerHeight) {
+              window.scrollTo({
+                top: Math.max(0, topRect.top + window.scrollY - 20),
+                behavior: "smooth",
+              });
+            }
+          }, 700);
+        });
+
+        // keyboard accessibility
+        [yesBtn, noBtn].forEach((btn) => {
+          btn.addEventListener("keyup", (e) => {
+            if (e.key === "Enter" || e.key === " ") btn.click();
+          });
+        });
+
+        // visibility tidy
+        document.addEventListener("visibilitychange", () => {
+          if (document.hidden) stopHearts();
+          else startHearts();
+        });
+      })();
+
+      /* -------------------- valentinesButton behavior — transition to card page -------------------- */
+      (function () {
+        const valentineBtn = document.getElementById("valentinesButton");
+        if (valentineBtn) {
+          valentineBtn.addEventListener("click", () => {
+            // Hide the button
+            valentineBtn.style.opacity = "0";
+
+            // Fade out the starfield canvas (contains blue text) and bg-hearts
+            const canvas = document.getElementById("starfield");
+            const bgHearts = document.querySelector(".bg-hearts");
+            if (canvas) canvas.classList.add("hidden");
+            if (bgHearts) bgHearts.classList.add("hidden");
+
+            // Wait for fade out, then show the card in place (no scrolling)
+            setTimeout(() => {
+              valentineBtn.style.display = "none";
+
+              const wrap = document.querySelector(".wrap");
+              if (wrap) {
+                wrap.classList.add("show");
+                // Focus the Yes button for accessibility
+                setTimeout(() => {
+                  const yesBtn = document.getElementById("yes");
+                  if (yesBtn) yesBtn.focus();
+                }, 400);
+              }
+            }, 600);
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>
